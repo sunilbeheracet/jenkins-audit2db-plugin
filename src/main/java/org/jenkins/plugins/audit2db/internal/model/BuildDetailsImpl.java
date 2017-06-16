@@ -15,8 +15,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,10 +30,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
+import org.jenkins.plugins.audit2db.data.BuildDetailsRepository;
+import org.jenkins.plugins.audit2db.internal.DbAuditPublisherImpl;
+import org.jenkins.plugins.audit2db.internal.data.HibernateUtil;
 import org.jenkins.plugins.audit2db.model.BuildDetails;
 import org.jenkins.plugins.audit2db.model.BuildNode;
 import org.jenkins.plugins.audit2db.model.BuildParameter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Data class for build details.
@@ -55,8 +62,10 @@ public class BuildDetailsImpl implements BuildDetails {
     private String userName;
     private final List<BuildParameter> parameters = new ArrayList<BuildParameter>();
     private BuildNode node = new BuildNodeImpl();
+    private String parent;
+    private String buildNumber;
 
-    /**
+   /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getId()
      */
     @Id
@@ -256,8 +265,38 @@ public class BuildDetailsImpl implements BuildDetails {
     public void setNode(final BuildNode node) {
 	this.node = node;
     }
+    
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#getParent()
+     */
+    @Column(name="parent",nullable = true)
+    public String getParent() {
+		return parent;
+	}
+    
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setParent(Parent)
+     */
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+	
+	 /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#getBuildNumber()
+     */
+    @Column(name="build_number",nullable = true)
+    public String getBuildNumber() {
+		return buildNumber;
+	}
+    
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setBuildNumber(PromotionNumber)
+     */
+	public void setBuildNumber(String buildNumber) {
+		this.buildNumber = buildNumber;
+	}
 
-    @Override
+	@Override
     public String toString() {
 	return String.format("%s [%s]", this.fullName, this.id);
     }
@@ -295,11 +334,13 @@ public class BuildDetailsImpl implements BuildDetails {
 			this.id, buildVariable.getKey()), buildVariable
 			.getKey(), buildVariable.getValue(), this));
 	    }
+	    /** Save Data into BuildPromotion */
+		DbAuditPublisherImpl.saveBuildPromotions(this, this.buildNumber,buildVariables.toString());
 	}
-
+	
 	return retval;
     }
-
+    
     private BuildNode resolveBuildNode(final Node node) {
 	String address = "UNKNOWN";
 	String hostname = "UNKNOWN";
@@ -353,7 +394,7 @@ public class BuildDetailsImpl implements BuildDetails {
 	    final String fullName, final Date startDate, final Date endDate,
 	    final long duration, final String userId, final String userName,
 	    final List<BuildParameter> parameters, final BuildNode node) {
-	this.id = id;
+    this.id = id;
 	this.name = name;
 	this.fullName = fullName;
 	this.startDate = startDate;
@@ -366,8 +407,7 @@ public class BuildDetailsImpl implements BuildDetails {
 	}
 	this.node = node;
     }
-
-    /**
+   /**
      * Constructs a new BuildDetailsImpl object using the details of the given
      * Jenkins build.
      * 
@@ -376,10 +416,15 @@ public class BuildDetailsImpl implements BuildDetails {
      */
     public BuildDetailsImpl(final AbstractBuild<?, ?> build) {
 	// this.id = build.getId();
-	this.name = build.getRootBuild().getProject().getDisplayName();
+    this.name = build.getRootBuild().getProject().getDisplayName();
 	this.fullName = build.getFullDisplayName();
 	this.startDate = build.getTime();
-
+	this.parent=Integer.toString(build.getRootBuild().getNumber());
+	this.buildNumber=Integer.toString(build.getNumber());
+	/* Condition for Promotion*/
+	if(this.parent.equalsIgnoreCase(buildNumber) && !fullName.contains("promotion")){
+		this.parent=null;
+	}
 	final List<CauseAction> actions = build.getActions(CauseAction.class);
 	boolean userFound = false;
 	for (final CauseAction action : actions) {
@@ -402,4 +447,5 @@ public class BuildDetailsImpl implements BuildDetails {
 	this.parameters
 		.addAll(resolveBuildParameters(build.getBuildVariables()));
     }
+      
 }

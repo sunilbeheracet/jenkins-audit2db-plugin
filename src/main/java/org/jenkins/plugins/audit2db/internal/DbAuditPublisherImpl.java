@@ -24,7 +24,9 @@ import org.jenkins.plugins.audit2db.data.BuildDetailsRepository;
 import org.jenkins.plugins.audit2db.internal.data.BuildDetailsHibernateRepository;
 import org.jenkins.plugins.audit2db.internal.data.HibernateUtil;
 import org.jenkins.plugins.audit2db.internal.model.BuildDetailsImpl;
+import org.jenkins.plugins.audit2db.internal.model.BuildPromotionsImpl;
 import org.jenkins.plugins.audit2db.model.BuildDetails;
+import org.jenkins.plugins.audit2db.model.BuildPromotions;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -36,7 +38,7 @@ public class DbAuditPublisherImpl extends Notifier implements DbAuditPublisher {
     .getLogger(DbAuditPublisherImpl.class.getName());
 
     // must be transient or it will be serialised in the job config
-    private transient BuildDetailsHibernateRepository repository;
+    private static transient BuildDetailsHibernateRepository repository;
 
     @Override
     public BuildDetailsRepository getRepository() {
@@ -130,7 +132,7 @@ public class DbAuditPublisherImpl extends Notifier implements DbAuditPublisher {
 	    final BuildListener listener) {
 	LOGGER.log(Level.FINE,
 		String.format("prebuild: %s;", build.getDisplayName()));
-
+	
 	Object id = null;
 	final BuildDetails details = new BuildDetailsImpl(build);
 	try {
@@ -140,5 +142,25 @@ public class DbAuditPublisherImpl extends Notifier implements DbAuditPublisher {
 	    LOGGER.log(Level.SEVERE, t.getMessage(), t);
 	}
 	return ((super.prebuild(build, listener)) && (id != null));
+    }
+   
+    public static void saveBuildPromotions(BuildDetails buildDetails,String promotionId,String params){
+    	try{
+    		BuildPromotions buildPromotions=new BuildPromotionsImpl();
+    		buildPromotions.setParams(params);
+    		buildPromotions.setPromotionId(promotionId);
+    		buildPromotions.setBuildDetails(buildDetails);
+    		saveBuildPromotions(buildPromotions);
+    	}catch(Exception e){
+    		LOGGER.log(Level.SEVERE, e.getMessage(), e);
+    	}
+    	
+    }
+    private static void saveBuildPromotions(final BuildPromotions promotions) {
+        if (null == promotions) {
+    	    throw new IllegalArgumentException(
+    		    "Invalid build promotions: cannot be null.");
+    	}
+        repository.getHibernateTemplate().save(promotions);
     }
 }

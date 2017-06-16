@@ -20,8 +20,10 @@ import org.hibernate.criterion.Restrictions;
 import org.jenkins.plugins.audit2db.data.BuildDetailsRepository;
 import org.jenkins.plugins.audit2db.internal.model.BuildDetailsImpl;
 import org.jenkins.plugins.audit2db.internal.model.BuildNodeImpl;
+import org.jenkins.plugins.audit2db.internal.model.BuildPromotionsImpl;
 import org.jenkins.plugins.audit2db.model.BuildDetails;
 import org.jenkins.plugins.audit2db.model.BuildNode;
+import org.jenkins.plugins.audit2db.model.BuildPromotions;
 import org.springframework.transaction.TransactionStatus;
 
 /**
@@ -74,7 +76,7 @@ public class BuildDetailsHibernateRepository extends
      */
     @Override
     public Object saveBuildDetails(final BuildDetails details) {
-	if (null == details) {
+    if (null == details) {
 	    throw new IllegalArgumentException(
 		    "Invalid build details: cannot be null.");
 	}
@@ -94,7 +96,8 @@ public class BuildDetailsHibernateRepository extends
      */
     @Override
     public void saveBuildDetailsList(final List<BuildDetails> details) {
-	if (null == details) {
+    
+    if (null == details) {
 	    throw new IllegalArgumentException(
 		    "Invalid build details: cannot be null.");
 	}
@@ -401,4 +404,4 @@ public class BuildDetailsHibernateRepository extends
 
 	return retval;
     }
-}
+ }
