@@ -31,6 +31,7 @@ import javax.persistence.OneToMany;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.collections.MapUtils;
 import org.hibernate.annotations.Parent;
 import org.jenkins.plugins.audit2db.internal.DbAuditPublisherImpl;
 import org.jenkins.plugins.audit2db.model.BuildDetails;
@@ -334,7 +335,9 @@ public class BuildDetailsImpl implements BuildDetails {
 	    /** Save Data into BuildPromotion */
 	    JSONObject json=new JSONObject();
 		json.putAll(buildVariables);
-		DbAuditPublisherImpl.saveBuildPromotions(this, this.buildNumber,json.toString());
+		if(!json.isEmpty()){
+			DbAuditPublisherImpl.saveBuildPromotions(this, this.buildNumber,json.toString(),this.parent,this.name);
+		}
 	}
 	
 	return retval;
@@ -423,6 +426,7 @@ public class BuildDetailsImpl implements BuildDetails {
 	if(this.parent.equalsIgnoreCase(buildNumber) && !fullName.contains("promotion")){
 		this.parent=null;
 	}
+	
 	final List<CauseAction> actions = build.getActions(CauseAction.class);
 	boolean userFound = false;
 	for (final CauseAction action : actions) {

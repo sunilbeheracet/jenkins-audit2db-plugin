@@ -24,4 +24,12 @@ public interface BuildPromotions {
 
 	void setBuildDetails(BuildDetails buildDetails);
 
+	String getBuildId();
+
+	void setBuildId(String buildId);
+
+	String getJobName();
+
+	void setJobName(String jobName);
+
 }

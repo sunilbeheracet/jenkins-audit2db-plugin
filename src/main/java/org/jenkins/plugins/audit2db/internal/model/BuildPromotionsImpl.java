@@ -23,6 +23,8 @@ public class BuildPromotionsImpl implements BuildPromotions {
 	private String id;
     private String params;
     private String promotionId;
+    private String buildId;
+    private String jobName;
     private BuildDetails buildDetails;
     
     public BuildPromotionsImpl(){
@@ -107,4 +109,31 @@ public class BuildPromotionsImpl implements BuildPromotions {
         this.buildDetails = buildDetails;
     }
 
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildPromotions#getBuildId()
+     */
+    @Override
+    @Column(name="build_id",nullable=true, unique=false)
+	public String getBuildId() {
+		return buildId;
+	}
+
+	/**
+     * @see org.jenkins.plugins.audit2db.model.BuildPromotions#setBuildId(java.lang.String)
+     */
+    @Override
+	public void setBuildId(String buildId) {
+		this.buildId = buildId;
+	}
+
+    @Override
+    @Column(name="job_name",nullable=true, unique=false)
+	public String getJobName() {
+		return jobName;
+	}
+    @Override
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+    
 }

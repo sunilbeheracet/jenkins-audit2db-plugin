@@ -144,12 +144,14 @@ public class DbAuditPublisherImpl extends Notifier implements DbAuditPublisher {
 	return ((super.prebuild(build, listener)) && (id != null));
     }
    
-    public static void saveBuildPromotions(BuildDetails buildDetails,String promotionId,String params){
+    public static void saveBuildPromotions(BuildDetails buildDetails,String promotionId,String params,String buildId,String jobName){
     	try{
     		BuildPromotions buildPromotions=new BuildPromotionsImpl();
     		buildPromotions.setParams(params);
     		buildPromotions.setPromotionId(promotionId);
     		buildPromotions.setBuildDetails(buildDetails);
+    		buildPromotions.setBuildId(buildId);
+    		buildPromotions.setJobName(jobName);
     		saveBuildPromotions(buildPromotions);
     	}catch(Exception e){
     		LOGGER.log(Level.SEVERE, e.getMessage(), e);
