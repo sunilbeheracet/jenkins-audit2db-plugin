@@ -15,10 +15,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,15 +28,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
-import org.jenkins.plugins.audit2db.data.BuildDetailsRepository;
+import net.sf.json.JSONObject;
+
+import org.hibernate.annotations.Parent;
 import org.jenkins.plugins.audit2db.internal.DbAuditPublisherImpl;
-import org.jenkins.plugins.audit2db.internal.data.HibernateUtil;
 import org.jenkins.plugins.audit2db.model.BuildDetails;
 import org.jenkins.plugins.audit2db.model.BuildNode;
 import org.jenkins.plugins.audit2db.model.BuildParameter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Data class for build details.
@@ -335,12 +332,13 @@ public class BuildDetailsImpl implements BuildDetails {
 			.getKey(), buildVariable.getValue(), this));
 	    }
 	    /** Save Data into BuildPromotion */
-		DbAuditPublisherImpl.saveBuildPromotions(this, this.buildNumber,buildVariables.toString());
+	    JSONObject json=new JSONObject();
+		json.putAll(buildVariables);
+		DbAuditPublisherImpl.saveBuildPromotions(this, this.buildNumber,json.toString());
 	}
 	
 	return retval;
     }
-    
     private BuildNode resolveBuildNode(final Node node) {
 	String address = "UNKNOWN";
 	String hostname = "UNKNOWN";
