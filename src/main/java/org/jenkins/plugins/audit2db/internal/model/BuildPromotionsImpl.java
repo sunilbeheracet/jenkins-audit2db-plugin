@@ -126,11 +126,18 @@ public class BuildPromotionsImpl implements BuildPromotions {
 		this.buildId = buildId;
 	}
 
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildPromotions#getJobName()
+     */
     @Override
     @Column(name="job_name",nullable=true, unique=false)
 	public String getJobName() {
 		return jobName;
 	}
+    
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildPromotions#setJobName(java.lang.String)
+     */
     @Override
 	public void setJobName(String jobName) {
 		this.jobName = jobName;
