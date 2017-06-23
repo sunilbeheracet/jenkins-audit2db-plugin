@@ -19,8 +19,5 @@
             class="org.jenkins.plugins.audit2db.internal.model.BuildParameterImpl" />
         <mapping
             class="org.jenkins.plugins.audit2db.internal.model.BuildNodeImpl" />
-	<mapping
-            class="org.jenkins.plugins.audit2db.internal.model.BuildPromotionsImpl" />
-
     </session-factory>
 </hibernate-configuration>
