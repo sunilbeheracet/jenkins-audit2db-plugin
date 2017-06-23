@@ -13,17 +13,17 @@ import java.util.List;
  * 
  */
 public interface BuildDetails {
-    Integer getId();
+    String getId();
 
-    void setId(Integer id);
+    void setId(String id);
 
-   /* String getName();
+    String getName();
 
-    void setName(String name);*/
+    void setName(String name);
 
-//    String getFullName();
+    String getFullName();
 
-//    void setFullName(String fullName);
+    void setFullName(String fullName);
 
     Date getStartDate();
 
@@ -49,28 +49,11 @@ public interface BuildDetails {
 
     void setUserName(String userName);
 
-    /*List<BuildParameter> getParameters();
+    List<BuildParameter> getParameters();
 
-    void setParameters(List<BuildParameter> params);*/
+    void setParameters(List<BuildParameter> params);
 
     BuildNode getNode();
 
     void setNode(BuildNode node);
-
-	/*String getParent();
-
-	void setParent(String parent);*/
-
-	Integer getBuildNumber();
-
-	void setBuildNumber(Integer buildNumber);
-
-	String getBuildId();
-
-	void setBuildId(String buildId);
-
-	BuildJob getJob();
-
-	void setJob(BuildJob job);
-
 }
