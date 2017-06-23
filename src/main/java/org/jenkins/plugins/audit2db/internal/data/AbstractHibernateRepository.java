@@ -1,6 +1,7 @@
 package org.jenkins.plugins.audit2db.internal.data;
 
 import org.hibernate.SessionFactory;
+import org.jenkins.plugins.audit2db.model.BuildDetails;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 

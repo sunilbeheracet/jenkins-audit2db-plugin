@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.jenkins.plugins.audit2db.model.BuildDetails;
+import org.jenkins.plugins.audit2db.model.BuildJob;
 import org.jenkins.plugins.audit2db.model.BuildNode;
 
 /**
@@ -41,7 +42,7 @@ public interface BuildDetailsRepository {
      *            the build details id.
      * @return the matching build details if found, otherwise <code>null</code>.
      */
-    BuildDetails getBuildDetailsById(String id);
+    BuildDetails getBuildDetailsById(Integer id);
 
     /**
      * Retrieves previously saved build details that match the given name.
@@ -224,4 +225,22 @@ public interface BuildDetailsRepository {
      */
     List<BuildDetails> getBuildDetails(String masterHostName,
 	    String projectName, Date fromDate, Date toDate);
+
+    /**Retrieve the BuildJob by name
+     * 
+     * @param name
+     * 	 	the name of Job
+     * @return a BuildJob matching the specified name
+     */
+    BuildJob getBuildJobByName(String name);
+    
+    /**Retrieve the BuildDetails By BuildJob Id and Build Number
+     * 
+     * @param buildJob
+     * 			the Build Job Details
+     * @param buildNumber
+     * 			the build number for a job
+     * @return BuildDetails
+     */
+    BuildDetails getBuildDetails(Integer jobId,Integer buildNumber);
 }

@@ -19,11 +19,11 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.jenkins.plugins.audit2db.data.BuildDetailsRepository;
 import org.jenkins.plugins.audit2db.internal.model.BuildDetailsImpl;
+import org.jenkins.plugins.audit2db.internal.model.BuildJobImpl;
 import org.jenkins.plugins.audit2db.internal.model.BuildNodeImpl;
-import org.jenkins.plugins.audit2db.internal.model.BuildPromotionsImpl;
 import org.jenkins.plugins.audit2db.model.BuildDetails;
+import org.jenkins.plugins.audit2db.model.BuildJob;
 import org.jenkins.plugins.audit2db.model.BuildNode;
-import org.jenkins.plugins.audit2db.model.BuildPromotions;
 import org.springframework.transaction.TransactionStatus;
 
 /**
@@ -76,7 +76,7 @@ public class BuildDetailsHibernateRepository extends
      */
     @Override
     public Object saveBuildDetails(final BuildDetails details) {
-    if (null == details) {
+	if (null == details) {
 	    throw new IllegalArgumentException(
 		    "Invalid build details: cannot be null.");
 	}
@@ -96,8 +96,7 @@ public class BuildDetailsHibernateRepository extends
      */
     @Override
     public void saveBuildDetailsList(final List<BuildDetails> details) {
-    
-    if (null == details) {
+	if (null == details) {
 	    throw new IllegalArgumentException(
 		    "Invalid build details: cannot be null.");
 	}
@@ -120,7 +119,7 @@ public class BuildDetailsHibernateRepository extends
      * @see org.jenkins.plugins.audit2db.data.BuildDetailsRepository#getBuildDetailsById(String)
      */
     @Override
-    public BuildDetails getBuildDetailsById(final String id) {
+    public BuildDetails getBuildDetailsById(final Integer id) {
 	return getHibernateTemplate().get(BuildDetailsImpl.class, id);
     }
 
@@ -306,7 +305,7 @@ public class BuildDetailsHibernateRepository extends
      */
     @Override
     public BuildDetails getBuildDetailsForBuild(final AbstractBuild<?, ?> build) {
-	final String id = new BuildDetailsImpl(build).getId();
+	final Integer id = new BuildDetailsImpl(build).getId();
 	return getBuildDetailsById(id);
     }
 
@@ -347,7 +346,7 @@ public class BuildDetailsHibernateRepository extends
 		    .findByCriteria(criteria);
 	    if ((buildDetails != null) && !buildDetails.isEmpty()) {
 		for (final BuildDetails detail : buildDetails) {
-		    final String projectName = detail.getName();
+		    final String projectName = detail.getJob().getName();
 		    if (!retval.contains(projectName)) {
 			retval.add(projectName);
 		    }
@@ -404,4 +403,49 @@ public class BuildDetailsHibernateRepository extends
 
 	return retval;
     }
- }
+    
+    /**
+     * @see org.jenkins.plugins.audit2db.data.BuildDetailsRepository#getBuildJobByName(java.lang.String)
+     */
+    @Override
+    public BuildJob getBuildJobByName(String name){
+    	BuildJob buildJob=null;
+    	try{
+    	DetachedCriteria criteria = DetachedCriteria
+    			.forClass(BuildJob.class);
+    		if (name != null) {
+    		    criteria = criteria.add(Restrictions.ilike("name", name));
+    		}
+    		@SuppressWarnings("unchecked")
+    		List<BuildJob> jobList=getHibernateTemplate().findByCriteria(criteria);
+    		if(jobList!=null && !jobList.isEmpty()){
+    			buildJob=jobList.get(0);
+    		}
+    	}catch(Exception e){
+    		LOGGER.log(Level.SEVERE, e.getMessage(), e);
+    	}
+		return buildJob;
+    }
+    /**
+     * @see org.jenkins.plugins.audit2db.data.BuildDetailsRepository#getBuildJobByName(java.lang.String)
+     */
+    @Override
+    public BuildDetails getBuildDetails(Integer jobId,Integer buildNumber){
+    	BuildDetails buildDetails=null;
+    	try{
+    		DetachedCriteria criteria = DetachedCriteria
+        			.forClass(BuildDetails.class,"detail");
+    		criteria=criteria.createAlias("detail.job", "job");
+    		criteria=criteria.add(Restrictions.eq("job.id", jobId));
+    		criteria=criteria.add(Restrictions.eq("detail.buildNumber", buildNumber));
+    		@SuppressWarnings("unchecked")
+    		List<BuildDetails> buildList=getHibernateTemplate().findByCriteria(criteria);
+    		if(buildList!=null && !buildList.isEmpty()){
+    			buildDetails=buildList.get(0);
+    		}
+    	}catch(Exception e){
+    		LOGGER.log(Level.SEVERE, e.getMessage(), e);
+    	}
+    	return buildDetails;
+    }
+}

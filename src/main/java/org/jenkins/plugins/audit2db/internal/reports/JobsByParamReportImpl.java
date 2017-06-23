@@ -111,7 +111,7 @@ public class JobsByParamReportImpl extends AbstractDbAuditReport implements Jobs
 		jenkinsHost, paramName, paramValue, startDate, endDate);
 
 	for (final BuildDetails details : buildDetails) {
-	    final String projectName = details.getName();
+	    final String projectName = details.getJob().getName();
 	    if (!retval.containsKey(projectName)) {
 		retval.put(projectName, new ArrayList<BuildDetails>());
 	    }
