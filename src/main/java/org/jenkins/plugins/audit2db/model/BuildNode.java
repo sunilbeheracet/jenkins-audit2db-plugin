@@ -37,4 +37,8 @@ public interface BuildNode {
     String getLabel();
 
     void setLabel(String label);
+
+	Integer getId();
+
+	void setId(Integer id);
 }

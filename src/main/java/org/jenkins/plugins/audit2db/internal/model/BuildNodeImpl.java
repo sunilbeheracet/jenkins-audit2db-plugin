@@ -5,6 +5,8 @@ package org.jenkins.plugins.audit2db.internal.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.jenkins.plugins.audit2db.model.BuildNode;
@@ -15,6 +17,7 @@ import org.jenkins.plugins.audit2db.model.BuildNode;
  */
 @Entity(name = "JENKINS_BUILD_NODE")
 public class BuildNodeImpl implements BuildNode {
+	private Integer id;
     private String address;
     private String hostName;
     private String displayName;
@@ -24,6 +27,24 @@ public class BuildNodeImpl implements BuildNode {
     private String label;
 
     /**
+     * @see org.jenkins.plugins.audit2db.model.BuildNode#getId()
+     */
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    @Override
+    public Integer getId() {
+		return id;
+	}
+
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildNode#setId()
+     */
+    @Override
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	/**
      * @see org.jenkins.plugins.audit2db.model.BuildNode#getMasterAddress()
      */
     @Column(nullable = false, unique = false)
@@ -77,7 +98,6 @@ public class BuildNodeImpl implements BuildNode {
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildNode#getUrl()
      */
-    @Id
     @Column(nullable = false, unique = true)
     @Override
     public String getUrl() {

@@ -13,7 +13,6 @@ import hudson.model.Node;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -24,17 +23,18 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import net.sf.json.JSONObject;
 
-import org.apache.commons.collections.MapUtils;
 import org.hibernate.annotations.Parent;
 import org.jenkins.plugins.audit2db.internal.DbAuditPublisherImpl;
 import org.jenkins.plugins.audit2db.model.BuildDetails;
+import org.jenkins.plugins.audit2db.model.BuildJob;
 import org.jenkins.plugins.audit2db.model.BuildNode;
 import org.jenkins.plugins.audit2db.model.BuildParameter;
 
@@ -49,72 +49,75 @@ public class BuildDetailsImpl implements BuildDetails {
     private final static Logger LOGGER = Logger
 	    .getLogger(BuildDetailsImpl.class.getName());
 
-    private String id;
-    private String name;
-    private String fullName;
+    private Integer id;
+    private String buildId;
+//    private String name;
+   // private String fullName;
     private Date startDate = new Date();
     private Date endDate;
     private Long duration;
     private String result;
     private String userId;
     private String userName;
-    private final List<BuildParameter> parameters = new ArrayList<BuildParameter>();
+//    private final List<BuildParameter> parameters = new ArrayList<BuildParameter>();
     private BuildNode node = new BuildNodeImpl();
-    private String parent;
-    private String buildNumber;
-
-   /**
+//    private String parent;
+    private Integer buildNumber;
+    private BuildJob job=new BuildJobImpl();
+    
+    /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getId()
      */
     @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(nullable = false, unique = true)
     @Override
-    public String getId() {
+    public Integer getId() {
 	return id;
     }
 
     /**
-     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setId(java.lang.String)
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setId(Integer)
      */
     @Override
-    public void setId(final String id) {
+    public void setId(final Integer id) {
 	this.id = id;
     }
 
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getName()
      */
-    @Override
+   /* @Override
     @Column(nullable = false, unique = false)
     public String getName() {
 	return name;
-    }
+    }*/
 
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#setName(java.lang.String)
      */
-    @Override
+    /*@Override
     public void setName(final String name) {
 	this.name = name;
-    }
+    }*/
 
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getFullName()
      */
-    @Column(nullable = false, unique = false)
+/*    @Column(nullable = false, unique = false)
     @Override
     public String getFullName() {
 	return fullName;
     }
-
+*/
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#setFullName(java.lang.String)
      */
-    @Override
+/*    @Override
     public void setFullName(final String fullName) {
 	this.fullName = fullName;
     }
-
+*/
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getStartDate()
      */
@@ -224,17 +227,17 @@ public class BuildDetailsImpl implements BuildDetails {
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getParameters()
      */
-    @OneToMany(cascade = CascadeType.ALL, targetEntity = BuildParameterImpl.class, mappedBy = "buildDetails")
+    /*@OneToMany(cascade = CascadeType.ALL, targetEntity = BuildParameterImpl.class, mappedBy = "buildDetails")
     @Column(nullable = true, unique = false)
     @Override
     public List<BuildParameter> getParameters() {
 	return parameters;
-    }
+    }*/
 
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#setParameters(java.util.List)
      */
-    @Override
+   /* @Override
     public void setParameters(final List<BuildParameter> params) {
 	if (null != params) {
 	    // need a temporary array otherwise hibernate
@@ -244,13 +247,13 @@ public class BuildDetailsImpl implements BuildDetails {
 	    this.parameters.clear();
 	    Collections.addAll(this.parameters, tempParams);
 	}
-    }
+    }*/
 
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getNode()
      */
     @ManyToOne(targetEntity = BuildNodeImpl.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = true, unique = false)
+    @JoinColumn(name="nodeId",nullable = true, unique = false)
     @Override
     public BuildNode getNode() {
 	return node;
@@ -267,36 +270,73 @@ public class BuildDetailsImpl implements BuildDetails {
     /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getParent()
      */
+   /* @Override
     @Column(name="parent",nullable = true)
     public String getParent() {
 		return parent;
-	}
-    
-    /**
+	}*/
+  
+	/**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#setParent(Parent)
      */
+   /* @Override
 	public void setParent(String parent) {
 		this.parent = parent;
 	}
-	
+	*/
 	 /**
      * @see org.jenkins.plugins.audit2db.model.BuildDetails#getBuildNumber()
      */
-    @Column(name="build_number",nullable = true)
-    public String getBuildNumber() {
+	@Override
+    @Column(nullable = false)
+    public Integer getBuildNumber() {
 		return buildNumber;
 	}
     
     /**
-     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setBuildNumber(PromotionNumber)
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setBuildNumber(Integer)
      */
-	public void setBuildNumber(String buildNumber) {
+    @Override
+	public void setBuildNumber(Integer buildNumber) {
 		this.buildNumber = buildNumber;
 	}
 
-	@Override
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setBuildNumber(Integer)
+     */
+    @Override
+    public String getBuildId() {
+		return buildId;
+	}
+
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setBuildNumber(Integer)
+     */
+    @Override
+	public void setBuildId(String buildId) {
+		this.buildId = buildId;
+	}
+
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#getJob()
+     */
+    @ManyToOne(cascade=CascadeType.ALL,fetch=FetchType.EAGER,targetEntity=BuildJobImpl.class)
+    @JoinColumn(name="jobId")
+    @Override
+	public BuildJob getJob() {
+		return job;
+	}
+
+    /**
+     * @see org.jenkins.plugins.audit2db.model.BuildDetails#setJob(BuildJob)
+     */
+    @Override
+	public void setJob(BuildJob job) {
+		this.job = job;
+	}
+    @Override
     public String toString() {
-	return String.format("%s [%s]", this.fullName, this.id);
+	return String.format("%s [%s]", this.node, this.buildId);
     }
 
     @Override
@@ -333,11 +373,11 @@ public class BuildDetailsImpl implements BuildDetails {
 			.getKey(), buildVariable.getValue(), this));
 	    }
 	    /** Save Data into BuildPromotion */
-	    JSONObject json=new JSONObject();
+	   /* JSONObject json=new JSONObject();
 		json.putAll(buildVariables);
 		if(!json.isEmpty()){
 			DbAuditPublisherImpl.saveBuildPromotions(this, this.buildNumber,json.toString(),this.parent,this.name);
-		}
+		}*/
 	}
 	
 	return retval;
@@ -391,21 +431,21 @@ public class BuildDetailsImpl implements BuildDetails {
      * @param parameters
      *            the build parameters (if any).
      */
-    public BuildDetailsImpl(final String id, final String name,
+    public BuildDetailsImpl(final String buildId, final String name,
 	    final String fullName, final Date startDate, final Date endDate,
 	    final long duration, final String userId, final String userName,
 	    final List<BuildParameter> parameters, final BuildNode node) {
-    this.id = id;
-	this.name = name;
-	this.fullName = fullName;
+    this.buildId = buildId;
+//	this.name = name;
+//	this.fullName = fullName;
 	this.startDate = startDate;
 	this.endDate = endDate;
 	this.duration = duration;
 	this.userId = userId;
 	this.userName = userName;
-	if ((parameters != null) && !parameters.isEmpty()) {
+	/*if ((parameters != null) && !parameters.isEmpty()) {
 	    this.parameters.addAll(parameters);
-	}
+	}*/
 	this.node = node;
     }
    /**
@@ -417,16 +457,12 @@ public class BuildDetailsImpl implements BuildDetails {
      */
     public BuildDetailsImpl(final AbstractBuild<?, ?> build) {
 	// this.id = build.getId();
-    this.name = build.getRootBuild().getProject().getDisplayName();
-	this.fullName = build.getFullDisplayName();
+//    this.name = build.getRootBuild().getProject().getDisplayName();
+//	this.fullName = build.getFullDisplayName();
 	this.startDate = build.getTime();
-	this.parent=Integer.toString(build.getRootBuild().getNumber());
-	this.buildNumber=Integer.toString(build.getNumber());
-	/* Condition for Promotion*/
-	if(this.parent.equalsIgnoreCase(buildNumber) && !fullName.contains("promotion")){
-		this.parent=null;
-	}
-	
+//	this.parent=Integer.toString(build.getRootBuild().getNumber());
+	this.buildNumber=build.getNumber();
+		
 	final List<CauseAction> actions = build.getActions(CauseAction.class);
 	boolean userFound = false;
 	for (final CauseAction action : actions) {
@@ -444,10 +480,10 @@ public class BuildDetailsImpl implements BuildDetails {
 	}
 
 	this.node = resolveBuildNode(build.getBuiltOn());
-	this.id = String
-		.format("%s/%s/%s", this.node, this.name, build.getId());
-	this.parameters
-		.addAll(resolveBuildParameters(build.getBuildVariables()));
-    }
+	this.buildId = String
+		.format("%s/%s/%s", this.node, build.getRootBuild().getProject().getDisplayName(), build.getId());
+	/*this.parameters
+		.addAll(resolveBuildParameters(build.getBuildVariables()));*/
+	}
       
 }

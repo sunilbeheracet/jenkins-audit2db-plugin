@@ -1,31 +1,27 @@
 package org.jenkins.plugins.audit2db.model;
 
 /**
- * Data model to map build promotions.
+ * Data model to map build job details.
  * 
  * @author Mindfire Solutions
  *
  */
-public interface BuildPromotions {
+public interface BuildJob {
 
 	Integer getId();
 
 	void setId(Integer id);
 
-	String getParameters();
-
-	void setParameters(String parameters);
-
 	Integer getPromotionNumber();
 
 	void setPromotionNumber(Integer promotionNumber);
 
-	BuildDetails getBuildDetails();
-
-	void setBuildDetails(BuildDetails buildDetails);
-
 	Integer getBuildNumber();
 
 	void setBuildNumber(Integer buildNumber);
+
+	String getName();
+
+	void setName(String name);
 
 }
