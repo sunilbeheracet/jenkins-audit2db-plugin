@@ -104,21 +104,24 @@ public class DbAuditPublisherImpl extends Notifier implements DbAuditPublisher {
 		Level.FINE,
 		String.format("perform: %s; launcher: %s",
 			build.getDisplayName(), launcher.toString()));
-
-	final BuildDetails details = getRepository().getBuildDetailsForBuild(
-		build);
-	details.setDuration(build.getDuration());
-	details.setEndDate(new Date(details.getStartDate().getTime()
-		+ details.getDuration()));
-	details.setResult(build.getResult().toString());
-
+	
 	boolean result = false;
 	try {
+		final BuildDetails details = getRepository().getBuildDetailsForBuild(
+				build);
+			details.setDuration(build.getDuration());
+			details.setEndDate(new Date(details.getStartDate().getTime()
+				+ details.getDuration()));
+			details.setResult(build.getResult().toString());
+
 	    getRepository().updateBuildDetails(details);
 	    LOGGER.log(Level.FINE,
 		    "Updated build details with id=" + details.getId());
-	    result = super.perform(build, launcher, listener);
+	    /**** Below Call Causes Stack Overflow Error ****/
+	//    result = super.perform(build, launcher, listener);
+	    result=true;
 	} catch (final Throwable t) {
+		result=false;
 	    LOGGER.log(Level.SEVERE, t.getMessage(), t);
 	}
 
